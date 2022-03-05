@@ -1,35 +1,44 @@
 import { LoginController } from '../../src/controllers'
 import { InvalidParamError, MissingParamError } from '../../src/errors'
-import { ForValidateEmailPort, HttpPort } from '@src/ports'
+import { ForValidateEmailPort, GenerateEncryptedCodePort, HttpPort } from '@src/ports'
 import { LoginRequestDTO } from '@src/dto'
 
 interface Sut {
   sut: LoginController
-  validateEmail: ForValidateEmailPort
+  validateEmailStub: ForValidateEmailPort
   fixture: HttpPort.Params<LoginRequestDTO>
+  generateEncryptedCodeStub: GenerateEncryptedCodePort
 }
 
 const makeSut = (): Sut => {
-  class ValidateEmail implements ForValidateEmailPort {
+  class ValidateEmailStub implements ForValidateEmailPort {
     execute(email: string): boolean {
       return true
     }
   }
+  class GenerateEncryptedCodeStub implements GenerateEncryptedCodePort {
+    execute({ toEncrypt: any, lifeTime: number }: { toEncrypt: any, lifeTime: any }): string {
+      return 'any_hashedToken'
+    }
+  }
+
   const fixture = {
     data: {
       email: 'any_email@email.com',
       password: 'any_password'
     }
   }
-  const validateEmail = new ValidateEmail()
-  const sut = new LoginController(validateEmail)
-  return { sut, validateEmail, fixture }
+
+  const generateEncryptedCodeStub = new GenerateEncryptedCodeStub()
+  const validateEmailStub = new ValidateEmailStub()
+  const sut = new LoginController(validateEmailStub, generateEncryptedCodeStub)
+  return { sut, validateEmailStub, fixture, generateEncryptedCodeStub }
 }
 describe('Login Controller', () => {
   test('should check if is a valid email', async () => {
-    const { sut, validateEmail, fixture } = makeSut()
+    const { sut, validateEmailStub, fixture } = makeSut()
 
-    const testable = jest.spyOn(validateEmail, 'execute')
+    const testable = jest.spyOn(validateEmailStub, 'execute')
 
     await sut.execute(fixture)
 
@@ -37,11 +46,11 @@ describe('Login Controller', () => {
   })
   test('should return status 400 if there is no email', async () => {
     try {
-      const { sut, fixture, validateEmail } = makeSut()
+      const { sut, fixture, validateEmailStub } = makeSut()
 
-      jest.spyOn(validateEmail, 'execute').mockImplementationOnce(() => false)
+      jest.spyOn(validateEmailStub, 'execute').mockImplementationOnce(() => false)
 
-      await sut.execute(fixture)
+      throw await sut.execute(fixture)
     } catch (testable) {
       expect(testable).toEqual(new InvalidParamError('email'))
       expect(testable.getStatusCode()).toBe(400)
@@ -57,7 +66,7 @@ describe('Login Controller', () => {
         }
       }
 
-      await sut.execute(fixture)
+      throw await sut.execute(fixture)
     } catch (testable) {
       expect(testable).toEqual(new MissingParamError('password'))
       expect(testable.getStatusCode()).toBe(400)
@@ -73,10 +82,18 @@ describe('Login Controller', () => {
         }
       }
 
-      await sut.execute(fixture)
+      throw await sut.execute(fixture)
     } catch (testable) {
       expect(testable).toEqual(new MissingParamError('email'))
       expect(testable.getStatusCode()).toBe(400)
     }
+  })
+  test('should return a hash in token response', async () => {
+    const { sut, fixture } = makeSut()
+
+    const testable = await sut.execute(fixture)
+
+    expect(testable.responseBody?.token.length).toBeGreaterThan(10)
+    expect(testable.statusCode).toEqual(200)
   })
 })
