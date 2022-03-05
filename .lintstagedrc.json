@@ -1,0 +1,3 @@
+{
+  "*.ts": ["npm run fmt", "npm run lint:fix", "npm run test:staged"]
+}
