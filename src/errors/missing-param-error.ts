@@ -5,6 +5,7 @@ export class MissingParamError extends Error implements ErrorPort {
   constructor(paramName: string) {
     super(`Missing param: ${paramName}`)
     this.name = 'MissingParamError'
+    this._statusCode = 400
   }
 
   getStatusCode(): number {
