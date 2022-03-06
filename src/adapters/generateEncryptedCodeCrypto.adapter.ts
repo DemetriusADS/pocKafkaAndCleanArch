@@ -1,5 +1,5 @@
 import { createHmac } from 'crypto'
-import { GenerateEncryptedCodePort } from '@src/ports'
+import { GenerateEncryptedCodePort } from '../ports'
 
 export class GenerateEncryptedCodeCryptoAdapter implements GenerateEncryptedCodePort {
   execute(data: { toEncrypt: any, lifeTime: any }): string {

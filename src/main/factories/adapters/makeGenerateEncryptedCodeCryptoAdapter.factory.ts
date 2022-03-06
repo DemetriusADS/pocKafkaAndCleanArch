@@ -1,4 +1,4 @@
-import { GenerateEncryptedCodeCryptoAdapter } from '@src/adapters'
+import { GenerateEncryptedCodeCryptoAdapter } from '../../../adapters'
 
 const makeGenerateEncryptedCodeCryptoAdapterfactory = (): GenerateEncryptedCodeCryptoAdapter =>
   new GenerateEncryptedCodeCryptoAdapter()

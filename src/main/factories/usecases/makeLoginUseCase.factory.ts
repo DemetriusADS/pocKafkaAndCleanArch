@@ -1,4 +1,4 @@
-import { LoginUseCase } from '@src/usecases'
+import { LoginUseCase } from '../../../usecases'
 import { makeGenerateEncryptedCodeCryptoAdapterfactory, makeNotifyKafkaAdapter } from '../adapters'
 
 const makeLoginUseCase = () =>

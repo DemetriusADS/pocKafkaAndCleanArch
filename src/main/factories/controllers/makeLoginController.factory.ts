@@ -1,4 +1,4 @@
-import { LoginController } from '@src/controllers'
+import { LoginController } from '../../../controllers'
 import { makeValidateEmailFactory } from '../utils'
 import { makeLoginUseCase } from '../usecases'
 

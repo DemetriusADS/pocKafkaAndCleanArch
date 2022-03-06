@@ -9,7 +9,7 @@ export class NotifyKafkaAdapter implements NotifyTopicPort<any> {
     await producer.connect()
     const toBeSended = {
       topic,
-      messages: [{ ...message }]
+      messages: [{ value: JSON.stringify({ ...message }) }]
     }
     await producer.send(toBeSended)
     await producer.disconnect()

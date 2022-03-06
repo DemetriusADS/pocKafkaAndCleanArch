@@ -1,4 +1,4 @@
-import { ValidateEmail } from '@src/utils'
+import { ValidateEmail } from '../../../utils'
 
 const makeValidateEmailFactory = (): ValidateEmail => new ValidateEmail()
 

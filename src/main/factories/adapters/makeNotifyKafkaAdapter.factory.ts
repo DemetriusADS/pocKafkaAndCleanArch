@@ -1,4 +1,4 @@
-import { NotifyKafkaAdapter } from '@src/adapters'
+import { NotifyKafkaAdapter } from '../../../adapters'
 import { makeKafkaFactory } from '../libs'
 
 const makeNotifyKafkaAdapter = () => new NotifyKafkaAdapter(makeKafkaFactory())
