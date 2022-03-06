@@ -1,12 +1,12 @@
 import { LoginNotifyMessageDTO, LoginRequestDTO } from '@src/dto'
-import { GenerateEncryptedCodePort, NotifyPort, UseCasePort } from '@src/ports'
+import { GenerateEncryptedCodePort, NotifyTopicPort, UseCasePort } from '@src/ports'
 import { LoginUseCase } from '../../src/usecases'
 
 interface Sut {
   sut: UseCasePort<LoginRequestDTO, string>
   fixture: LoginRequestDTO
   generateEncryptedCodeStub: GenerateEncryptedCodePort
-  notifyStub: NotifyPort<LoginNotifyMessageDTO>
+  notifyStub: NotifyTopicPort<LoginNotifyMessageDTO>
 }
 
 const makeFixture = (): LoginRequestDTO => ({
@@ -23,16 +23,16 @@ const makeGenerateEncryptedCodePort = () => {
   return new GenerateEncryptedCodeStub()
 }
 
-const makeNotifyPort = () => {
-  class NotifyStub implements NotifyPort<LoginNotifyMessageDTO> {
-    send(message: LoginNotifyMessageDTO) {}
+const makeNotifyTopicPort = () => {
+  class NotifyStub implements NotifyTopicPort<LoginNotifyMessageDTO> {
+    async send(message: NotifyTopicPort.Params<LoginNotifyMessageDTO>) {}
   }
   return new NotifyStub()
 }
 const makeSut = (): Sut => {
   const fixture = makeFixture()
   const generateEncryptedCodeStub = makeGenerateEncryptedCodePort()
-  const notifyStub = makeNotifyPort()
+  const notifyStub = makeNotifyTopicPort()
   const sut = new LoginUseCase(generateEncryptedCodeStub, notifyStub)
 
   return {
@@ -74,9 +74,12 @@ describe('LoginUseCase', () => {
     expect(testable).toHaveBeenCalled()
     expect(testable).toHaveBeenCalledWith(
       expect.objectContaining({
-        text: 'Login Effectuated',
-        email: fixture.email,
-        time: expect.any(Date)
+        topic: expect.any(String),
+        message: {
+          text: 'Login Effectuated',
+          email: fixture.email,
+          time: expect.any(Date)
+        }
       })
     )
   })
