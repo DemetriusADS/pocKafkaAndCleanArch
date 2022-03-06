@@ -1,13 +1,13 @@
 import { LoginController } from '../../src/controllers'
 import { InvalidParamError, MissingParamError } from '../../src/errors'
-import { ForValidateEmailPort, GenerateEncryptedCodePort, HttpPort } from '@src/ports'
+import { ForValidateEmailPort, HttpPort, UseCasePort } from '@src/ports'
 import { LoginRequestDTO } from '@src/dto'
 
 interface Sut {
   sut: LoginController
   validateEmailStub: ForValidateEmailPort
   fixture: HttpPort.Params<LoginRequestDTO>
-  generateEncryptedCodeStub: GenerateEncryptedCodePort
+  loginUseCaseStub: UseCasePort<LoginRequestDTO, string>
 }
 
 const makeValidateEmailStub = () => {
@@ -20,14 +20,14 @@ const makeValidateEmailStub = () => {
   return new ValidateEmailStub()
 }
 
-const makeGenerateEncryptedCodeStub = () => {
-  class GenerateEncryptedCodeStub implements GenerateEncryptedCodePort {
-    execute({ toEncrypt: any, lifeTime: number }: { toEncrypt: any, lifeTime: any }): string {
-      return 'any_hashedToken'
+const makeLoginUseCaseStub = () => {
+  class LoginUseCaseStub implements UseCasePort<LoginRequestDTO, string> {
+    async execute(): Promise<string> {
+      return await Promise.resolve('any_hashedToken')
     }
   }
 
-  return new GenerateEncryptedCodeStub()
+  return new LoginUseCaseStub()
 }
 
 const makeSut = (): Sut => {
@@ -38,10 +38,10 @@ const makeSut = (): Sut => {
     }
   }
 
-  const generateEncryptedCodeStub = makeGenerateEncryptedCodeStub()
+  const loginUseCaseStub = makeLoginUseCaseStub()
   const validateEmailStub = makeValidateEmailStub()
-  const sut = new LoginController(validateEmailStub, generateEncryptedCodeStub)
-  return { sut, validateEmailStub, fixture, generateEncryptedCodeStub }
+  const sut = new LoginController(validateEmailStub, loginUseCaseStub)
+  return { sut, validateEmailStub, fixture, loginUseCaseStub }
 }
 describe('Login Controller', () => {
   test('should check if is a valid email', async () => {
@@ -104,5 +104,13 @@ describe('Login Controller', () => {
 
     expect(testable.responseBody?.token.length).toBeGreaterThan(10)
     expect(testable.statusCode).toEqual(200)
+  })
+
+  test('should call loginUsecase with correct params', async () => {
+    const { sut, loginUseCaseStub, fixture } = makeSut()
+    const testable = jest.spyOn(loginUseCaseStub, 'execute')
+    await sut.execute(fixture)
+
+    expect(testable).toHaveBeenCalledWith(fixture.data)
   })
 })

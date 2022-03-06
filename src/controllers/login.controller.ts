@@ -1,12 +1,11 @@
-import { ControllerPort, ForValidateEmailPort, HttpPort } from '@src/ports'
+import { ControllerPort, ForValidateEmailPort, HttpPort, UseCasePort } from '@src/ports'
 import { LoginRequestDTO, LoginResponseDTO } from '@src/dto'
 import { InvalidParamError, MissingParamError } from '../errors'
-import { LoginUseCase } from '@src/usecases'
 
 export class LoginController implements ControllerPort {
   constructor(
     private readonly isValidEmail: ForValidateEmailPort,
-    private readonly loginUseCase: LoginUseCase
+    private readonly loginUseCase: UseCasePort<LoginRequestDTO, string>
   ) {}
 
   async execute({
@@ -23,13 +22,6 @@ export class LoginController implements ControllerPort {
     }
 
     const token = await this.loginUseCase.execute(data)
-    // const token = this.generateEncryptedCodeCryptoAdapter.execute({
-    //   toEncrypt: {
-    //     email: data.email,
-    //     password: data.password
-    //   },
-    //   lifeTime: 5000
-    // })
 
     return await Promise.resolve({
       statusCode: 200,
