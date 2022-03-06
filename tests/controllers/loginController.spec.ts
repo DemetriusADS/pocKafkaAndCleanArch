@@ -10,18 +10,27 @@ interface Sut {
   generateEncryptedCodeStub: GenerateEncryptedCodePort
 }
 
-const makeSut = (): Sut => {
+const makeValidateEmailStub = () => {
   class ValidateEmailStub implements ForValidateEmailPort {
     execute(email: string): boolean {
       return true
     }
   }
+
+  return new ValidateEmailStub()
+}
+
+const makeGenerateEncryptedCodeStub = () => {
   class GenerateEncryptedCodeStub implements GenerateEncryptedCodePort {
     execute({ toEncrypt: any, lifeTime: number }: { toEncrypt: any, lifeTime: any }): string {
       return 'any_hashedToken'
     }
   }
 
+  return new GenerateEncryptedCodeStub()
+}
+
+const makeSut = (): Sut => {
   const fixture = {
     data: {
       email: 'any_email@email.com',
@@ -29,8 +38,8 @@ const makeSut = (): Sut => {
     }
   }
 
-  const generateEncryptedCodeStub = new GenerateEncryptedCodeStub()
-  const validateEmailStub = new ValidateEmailStub()
+  const generateEncryptedCodeStub = makeGenerateEncryptedCodeStub()
+  const validateEmailStub = makeValidateEmailStub()
   const sut = new LoginController(validateEmailStub, generateEncryptedCodeStub)
   return { sut, validateEmailStub, fixture, generateEncryptedCodeStub }
 }
