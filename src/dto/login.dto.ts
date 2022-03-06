@@ -6,3 +6,9 @@ export interface LoginRequestDTO {
 export interface LoginResponseDTO {
   token: string
 }
+
+export interface LoginNotifyMessageDTO {
+  text: string
+  email: string
+  time: Date
+}
