@@ -1,7 +1,6 @@
 export * from './http.port'
 export * from './controller.port'
 export * from './forValidateEmail.port'
-export * from './error.port'
 export * from './generateEncryptedCode.port'
 export * from './usecase.port'
 export * from './notifyTopic.port'
