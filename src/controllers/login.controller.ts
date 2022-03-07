@@ -1,6 +1,7 @@
 import { ControllerPort, ForValidateEmailPort, HttpPort, UseCasePort } from '@src/ports'
 import { LoginRequestDTO, LoginResponseDTO } from '@src/dto'
-import { InvalidParamError, MissingParamError, ServerError } from '../errors'
+import { InvalidParamError, MissingParamError } from '../errors'
+import { badRequest, ok, serverError } from '../helpers/http-helper'
 
 export class LoginController implements ControllerPort {
   constructor(
@@ -15,23 +16,18 @@ export class LoginController implements ControllerPort {
       const requiredParams = ['email', 'password']
       for (const requiredParam of requiredParams) {
         if (!data[requiredParam]) {
-          throw new MissingParamError(requiredParam)
+          return badRequest(new MissingParamError(requiredParam))
         }
       }
       if (!this.isValidEmail.execute(data.email)) {
-        throw new InvalidParamError('email')
+        return badRequest(new InvalidParamError('email'))
       }
 
       const token = await this.loginUseCase.execute(data)
 
-      return await Promise.resolve({
-        statusCode: 200,
-        responseBody: {
-          token
-        }
-      })
+      return ok({ token })
     } catch (error) {
-      throw new ServerError(error.message)
+      return serverError()
     }
   }
 }
