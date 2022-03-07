@@ -1,3 +1,6 @@
+![Node version](https://img.shields.io/badge/node%20version-16.x-brightgreen)
+![Docker](https://img.shields.io/badge/dependencies-Docker-blue)
+![Kafka](https://img.shields.io/badge/dependencies-Kafka-red)
 # Overview
 This project is a POC and because of this, it is being running with Nodemon script.
 The main motivation was  testing an integration with  ExpressJS and Apache Kafka, adopting as main architecture Clean Architecture. So, the idea is be able to change all external frameworks (ExpressJS), and the topic broker (Kafka) without compromise the main core..
