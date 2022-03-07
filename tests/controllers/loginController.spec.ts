@@ -54,48 +54,39 @@ describe('Login Controller', () => {
     expect(testable).toHaveBeenCalledWith(fixture.data.email)
   })
   test('should return status 400 if there is no email', async () => {
-    try {
-      const { sut, fixture, validateEmailStub } = makeSut()
+    const { sut, fixture, validateEmailStub } = makeSut()
 
-      jest.spyOn(validateEmailStub, 'execute').mockImplementationOnce(() => false)
+    jest.spyOn(validateEmailStub, 'execute').mockImplementationOnce(() => false)
 
-      throw await sut.execute(fixture)
-    } catch (testable) {
-      expect(testable).toEqual(new InvalidParamError('email'))
-      expect(testable.getStatusCode()).toBe(400)
-    }
+    const testable = await sut.execute(fixture)
+    expect(testable.responseBody).toEqual(new InvalidParamError('email'))
+    expect(testable.statusCode).toBe(400)
   })
   test('should return status 400 if there is no password', async () => {
-    try {
-      const { sut } = makeSut()
+    const { sut } = makeSut()
 
-      const fixture: any = {
-        data: {
-          email: 'any_email@email.com'
-        }
+    const fixture: any = {
+      data: {
+        email: 'any_email@email.com'
       }
-
-      throw await sut.execute(fixture)
-    } catch (testable) {
-      expect(testable).toEqual(new MissingParamError('password'))
-      expect(testable.getStatusCode()).toBe(400)
     }
+
+    const testable = await sut.execute(fixture)
+    expect(testable.responseBody).toEqual(new MissingParamError('password'))
+    expect(testable.statusCode).toBe(400)
   })
   test('should return status 400 if there is invalid email', async () => {
-    try {
-      const { sut } = makeSut()
+    const { sut } = makeSut()
 
-      const fixture: any = {
-        data: {
-          password: 'any_password'
-        }
+    const fixture: any = {
+      data: {
+        password: 'any_password'
       }
-
-      throw await sut.execute(fixture)
-    } catch (testable) {
-      expect(testable).toEqual(new MissingParamError('email'))
-      expect(testable.getStatusCode()).toBe(400)
     }
+
+    const testable = await sut.execute(fixture)
+    expect(testable.responseBody).toEqual(new MissingParamError('email'))
+    expect(testable.statusCode).toBe(400)
   })
   test('should return a hash in token response', async () => {
     const { sut, fixture } = makeSut()
