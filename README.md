@@ -35,9 +35,13 @@ To run all tests and see the coverage, run:
 
 ## Listening messages in Kafka Container
 In a separeted terminal, enter in docker Kafka container:
-`docker exec -it loginandkafka_kafka_1 bash`
+```bash
+docker exec -it kafka_container bash
+```
 
 If, every thing is ok, now you can run the command below:
-`kafka-console-consumer.sh —bootstrap-server kafka:9092 —topic topic-1 —from-beginning`
+```bash
+kafka-console-consumer.sh —bootstrap-server kafka:9092 —topic topic-1 —from-beginning
+```
 
 Now, you are able to listen all messages that has been sent to `topic-1`
